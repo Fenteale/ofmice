@@ -7,6 +7,19 @@ there's a --feature steam_wrangler that requires the steam sdk to be installed a
 TODO: Other miscellanious system dependencies
 (use ldd to find out what libs it uses)
 
+### Building in Windows
+To build in windows, you need to install gtk through [MSYS2](https://www.msys2.org/).
+The MSYS packages needed are `mingw-w64-x86_64-gtk3` `mingw-w64-x86_64-toolchain`  and `mingw-w64-x86_64-clang`. You can install them with the following command:
+```pacman -S mingw-w64-x86_64-gtk3 mingw-w64-x86_64-toolchain mingw-w64-x86_64-clang```
+
+Also, there are a few environment variables that need to be set.  `GTK_LIB_DIR` needs to be set where the gtk package installed its libraries.  By default this is `C:\msys64\mingw64\lib`.  As mentioned above, `STEAM_SDK_LOCATION` must be set to use steam_wrangler.  In addition, your `PATH` should include the path to MSYS's mingw binaries.  By default this is `C:\msys64\mingw64\bin`.
+
+After that is setup, to build and run the project, you might need to add `--target=x86_64-pc-windows-gnu` to the cargo options like so:
+```cargo run --target=x86_64-pc-windows-gnu```
+
+If for some reason it's not letting you compile for that target, you may have to run the command:
+```rustup target add x86_64-pc-windows-gnu```
+
 ## Finished
 * Basic GTK skeleton
 * Pull SSDK path from steamworks and ensure TF2 is installed.

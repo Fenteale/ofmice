@@ -136,18 +136,30 @@ fn build_ui(application: &gtk::Application) {
 
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
-    lang_select.set_active_id(Some("english"));
+    //lang_select.set_active_id(Some("english"));
     unsafe {
-        let lc = std::ffi::CStr::from_ptr(setlocale(LC_ALL, ptr::null())).to_string_lossy();
-        println!("Locale is: {:?}", lc);
-    }
-    //unsafe {
-        
-        /*for x in (*setlocale(LC_ALL, ptr::null())).inter_mut()
+        let lc = String::from(std::ffi::CStr::from_ptr(setlocale(LC_ALL, ptr::null())).to_string_lossy());
+        println!("Locale is: {}", lc.to_ascii_lowercase());
+        let lc_l = lc.to_ascii_lowercase();
+        let mut c = lc_l.chars();
+        if c.next() == Some('e')
         {
-            print!("{}", x);
-        }*/
-    //}
+            if c.next() == Some('n')
+            {
+                println!("english!");
+                lang_select.set_active_id(Some("english"));
+            }
+        }
+        c = lc_l.chars();
+        if c.next() == Some('r')
+        {
+            if c.next() == Some('u')
+            {
+                println!("russian!");
+                lang_select.set_active_id(Some("russian"));
+            }
+        }
+    }
 
     // Save the config when the config tab is navigated away from
     let home_screen: Notebook = builder.get_object("home_screen").unwrap();

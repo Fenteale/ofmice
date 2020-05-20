@@ -138,8 +138,16 @@ fn build_ui(application: &gtk::Application) {
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
     lang_select.set_active_id(Some("english"));
     unsafe {
-        println!("Locale is: {:?}", *setlocale(LC_ALL, ptr::null()));
+        let lc = std::ffi::CStr::from_ptr(setlocale(LC_ALL, ptr::null())).to_string_lossy();
+        println!("Locale is: {:?}", lc);
     }
+    //unsafe {
+        
+        /*for x in (*setlocale(LC_ALL, ptr::null())).inter_mut()
+        {
+            print!("{}", x);
+        }*/
+    //}
 
     // Save the config when the config tab is navigated away from
     let home_screen: Notebook = builder.get_object("home_screen").unwrap();

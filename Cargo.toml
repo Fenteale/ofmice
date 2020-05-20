@@ -39,6 +39,9 @@ serde_derive = "1.0.106"
 serde = "1.0.106"
 serde_json = "1.0.52"
 
+#fenteale stuff (locales)
+libc = "0.2.68"
+
 # async main
 tokio = { version = "0.2.20", features = ["rt-threaded", "macros"] }
 gdk = "0.12.1"

@@ -22,6 +22,10 @@ use gio::ApplicationFlags;
 use glib::{Continue, clone};
 use gtk::*;
 
+//fentele stuff (locales)
+use libc::{setlocale, LC_ALL};
+use std::ptr;
+
 
 #[derive(Clone)]
 struct ErrorDisplayer{
@@ -128,6 +132,13 @@ fn build_ui(application: &gtk::Application) {
             md.destroy();
             Inhibit(true)
         });
+    }
+
+    //Set the default language
+    let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
+    lang_select.set_active_id(Some("english"));
+    unsafe {
+        println!("Locale is: {:?}", *setlocale(LC_ALL, ptr::null()));
     }
 
     // Save the config when the config tab is navigated away from

@@ -136,29 +136,12 @@ fn build_ui(application: &gtk::Application) {
 
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
-    //lang_select.set_active_id(Some("english"));
     unsafe {
         let lc = String::from(std::ffi::CStr::from_ptr(setlocale(LC_ALL, ptr::null())).to_string_lossy());
-        println!("Locale is: {}", lc.to_ascii_lowercase());
+        println!("Locale is: {}", lc);
         let lc_l = lc.to_ascii_lowercase();
-        let mut c = lc_l.chars();
-        if c.next() == Some('e')
-        {
-            if c.next() == Some('n')
-            {
-                println!("english!");
-                lang_select.set_active_id(Some("english"));
-            }
-        }
-        c = lc_l.chars();
-        if c.next() == Some('r')
-        {
-            if c.next() == Some('u')
-            {
-                println!("russian!");
-                lang_select.set_active_id(Some("russian"));
-            }
-        }
+        let lc_trunc = lc_l.get_unchecked(0..2);
+        lang_select.set_active_id(Some(lc_trunc));
     }
 
     // Save the config when the config tab is navigated away from

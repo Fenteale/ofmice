@@ -138,8 +138,8 @@
                       <object class="GtkComboBoxText" id="langs_sel">
                         <property name="hexpand">true</property>
                         <items>
-                          <item translatable="yes" id="english">English</item>
-                          <item translatable="yes" id="russian">Русский</item>
+                          <item translatable="yes" id="en">English</item>
+                          <item translatable="yes" id="ru">Русский</item>
                         </items>
                       </object>
                       <packing>

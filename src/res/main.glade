@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface>
+<interface domain="of-mice">
   <object class="GtkWindow" id="window">
     <property name="title" translatable="yes">Open Fortress Launcher</property>
     <property name="default_width">640</property>
@@ -138,8 +138,8 @@
                       <object class="GtkComboBoxText" id="langs_sel">
                         <property name="hexpand">true</property>
                         <items>
-                          <item translatable="yes" id="en">English</item>
-                          <item translatable="yes" id="ru">Русский</item>
+                          <item translatable="no" id="en">English</item>
+                          <item translatable="no" id="ru">Русский</item>
                         </items>
                       </object>
                       <packing>

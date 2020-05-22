@@ -72,14 +72,33 @@ impl Model {
 
 fn build_ui(application: &gtk::Application) {
     //get localization ready
-    setlocale(LocaleCategory::LcAll, "");
+    /*setlocale(LocaleCategory::LcAll, "");
     bindtextdomain("of-mice", ".");
     textdomain("of-mice");
-    println!("{}", gettext("Localization loaded."));
+    */
+    let ts_msg = match TextDomain::new("of-mice")
+        .skip_system_data_paths()
+        .init()
+    {
+        Ok(locale) => {
+            format!("Translation found, 'setlocale' returned {:?}", locale)
+        }
+        Err(TextDomainError::TranslationNotFound(lang)) => {
+            format!("Translation not found for {}", lang)
+        }
+        Err(TextDomainError::InvalidLocale(locale)) => {
+            format!("Invalid locale: {}", locale)
+        }
+    };
+    println!("{} {}", gettext("Localization loaded.  Texdomain init result: "), ts_msg);
 
 
     // Build our UI from ze XML
     let builder = Builder::new_from_string(load_glade().as_ref());
+    
+    BuilderExt::set_translation_domain(&builder, Some("of-mice"));
+
+    //builder.set_translation_domain
 
     // Apply the CSS to ze XML
     let provider = CssProvider::new();
@@ -143,7 +162,7 @@ fn build_ui(application: &gtk::Application) {
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
 
-    let lc = setlocale(LocaleCategory::LcAll, "").unwrap_or("".to_string());
+    let lc = setlocale(LocaleCategory::LcAll, "").unwrap_or("en_US.UTF-8".to_string());
     println!("Locale is: {}", lc);
     let lc_l = lc.to_ascii_lowercase();
     let lc_trunc = lc_l.get(0..2);

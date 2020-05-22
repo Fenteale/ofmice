@@ -75,6 +75,7 @@ fn build_ui(application: &gtk::Application) {
     setlocale(LocaleCategory::LcAll, "");
     bindtextdomain("of-mice", ".");
     textdomain("of-mice");
+    println!("{}", gettext("Localization loaded."));
 
 
     // Build our UI from ze XML
@@ -141,13 +142,12 @@ fn build_ui(application: &gtk::Application) {
 
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
-    unsafe {
-        let lc = setlocale(LocaleCategory::LcAll, "").unwrap();
-        println!("Locale is: {}", lc);
-        let lc_l = lc.to_ascii_lowercase();
-        let lc_trunc = lc_l.get_unchecked(0..2);
-        lang_select.set_active_id(Some(lc_trunc));
-    }
+
+    let lc = setlocale(LocaleCategory::LcAll, "").unwrap();
+    println!("Locale is: {}", lc);
+    let lc_l = lc.to_ascii_lowercase();
+    let lc_trunc = lc_l.get(0..2);
+    lang_select.set_active_id(lc_trunc);
 
     // Save the config when the config tab is navigated away from
     let home_screen: Notebook = builder.get_object("home_screen").unwrap();

@@ -23,8 +23,7 @@ use glib::{Continue, clone};
 use gtk::*;
 
 //fentele stuff (locales)
-use libc::{setlocale, LC_ALL};
-use std::ptr;
+use gettextrs::*;
 
 
 #[derive(Clone)]
@@ -72,6 +71,12 @@ impl Model {
 }
 
 fn build_ui(application: &gtk::Application) {
+    //get localization ready
+    setlocale(LocaleCategory::LcAll, "");
+    bindtextdomain("of-mice", ".");
+    textdomain("of-mice");
+
+
     // Build our UI from ze XML
     let builder = Builder::new_from_string(load_glade().as_ref());
 
@@ -137,7 +142,7 @@ fn build_ui(application: &gtk::Application) {
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
     unsafe {
-        let lc = String::from(std::ffi::CStr::from_ptr(setlocale(LC_ALL, ptr::null())).to_string_lossy());
+        let lc = setlocale(LocaleCategory::LcAll, "").unwrap();
         println!("Locale is: {}", lc);
         let lc_l = lc.to_ascii_lowercase();
         let lc_trunc = lc_l.get_unchecked(0..2);

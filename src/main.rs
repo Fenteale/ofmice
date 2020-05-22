@@ -143,7 +143,7 @@ fn build_ui(application: &gtk::Application) {
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
 
-    let lc = setlocale(LocaleCategory::LcAll, "").unwrap();
+    let lc = setlocale(LocaleCategory::LcAll, "").unwrap_or("");
     println!("Locale is: {}", lc);
     let lc_l = lc.to_ascii_lowercase();
     let lc_trunc = lc_l.get(0..2);

@@ -3,6 +3,7 @@
 pub mod platform;
 pub mod download;
 pub mod installation;
+pub mod translate;
 #[cfg(feature = "steam_wrangler")]
 pub mod steam_wrangler;
 pub mod progress;

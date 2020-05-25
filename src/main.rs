@@ -8,6 +8,7 @@ use installation::Installation;
 use progress::Progress;
 use platform::ssdk_exe;
 use download::download;
+use translate::*;
 
 use std::sync::Arc;
 use arc_swap::ArcSwap;
@@ -24,6 +25,7 @@ use gtk::*;
 
 //fentele stuff (locales)
 use gettextrs::*;
+use std::collections::HashMap;
 
 
 #[derive(Clone)]
@@ -72,33 +74,17 @@ impl Model {
 
 fn build_ui(application: &gtk::Application) {
     //get localization ready
-    /*setlocale(LocaleCategory::LcAll, "");
-    bindtextdomain("of-mice", ".");
-    textdomain("of-mice");
-    */
-    let ts_msg = match TextDomain::new("of-mice")
-        .skip_system_data_paths()
-        .init()
-    {
-        Ok(locale) => {
-            format!("Translation found, 'setlocale' returned {:?}", locale)
-        }
-        Err(TextDomainError::TranslationNotFound(lang)) => {
-            format!("Translation not found for {}", lang)
-        }
-        Err(TextDomainError::InvalidLocale(locale)) => {
-            format!("Invalid locale: {}", locale)
-        }
-    };
-    println!("{} {}", gettext("Localization loaded.  Texdomain init result: "), ts_msg);
-
+    let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
+    
+    let mut tsm: HashMap<String, String>= HashMap::new();
+    //load_translation("en", &mut tsm);
+    
 
     // Build our UI from ze XML
     let builder = Builder::new_from_string(load_glade().as_ref());
-    
-    BuilderExt::set_translation_domain(&builder, Some("of-mice"));
 
-    //builder.set_translation_domain
+    //translate UI
+    translate_ui(&builder, &mut tsm);
 
     // Apply the CSS to ze XML
     let provider = CssProvider::new();
@@ -162,11 +148,14 @@ fn build_ui(application: &gtk::Application) {
     //Set the default language
     let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
 
-    let lc = setlocale(LocaleCategory::LcAll, "").unwrap_or("en_US.UTF-8".to_string());
+    
     println!("Locale is: {}", lc);
     let lc_l = lc.to_ascii_lowercase();
     let lc_trunc = lc_l.get(0..2);
     lang_select.set_active_id(lc_trunc);
+    load_translation(lc_trunc.unwrap_or("en"), &mut tsm);
+    translate_ui(&builder, &mut tsm);
+
 
     // Save the config when the config tab is navigated away from
     let home_screen: Notebook = builder.get_object("home_screen").unwrap();

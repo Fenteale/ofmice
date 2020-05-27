@@ -2,29 +2,28 @@ use gtk::*;
 use glib::object::ObjectExt;
 use std::collections::HashMap;
 
-use std::fs::*;
-use std::iter::FilterMap;
 use lazy_static::lazy_static;
 use std::sync::Mutex;
+use gettextrs::*;
 
 
 lazy_static! {
     static ref TRANSLATE_MAP: Mutex<HashMap<String, HashMap<String, String>>> = {
-        let mut m = HashMap::new();
+        let m = HashMap::new();
         Mutex::new(m)
     };
 }
 
 lazy_static! {
     static ref PREV_TRANSLATED: Mutex<HashMap<String, String>> = {
-        let mut m = HashMap::new();
+        let m = HashMap::new();
         Mutex::new(m)
     };
 }
 
 lazy_static! {
     static ref CURR_LOCALE: Mutex<String> = {
-        let mut s = String::new();
+        let s = String::new();
         Mutex::new(s)
     };
 }
@@ -47,20 +46,19 @@ pub fn translate_ui(builder: &gtk::Builder)
         {
             ts = get_translate(lts.get().unwrap().unwrap());
 
-            //println!("{}", ts);
+            
             if let Err(set_t) = x.set_property("label", &ts)
             {
                 println!("Error translating element: {}", set_t);
             }
         }
     }
-    //clear_prev();
-    //m.clear()
+    
 }
 
 pub fn set_lang(lang_code: &str)
 {
-    let mut m = TRANSLATE_MAP.lock().unwrap();
+    let m = TRANSLATE_MAP.lock().unwrap();
     let mut s = CURR_LOCALE.lock().unwrap();
     s.clear();
     if m.contains_key(lang_code)
@@ -73,20 +71,29 @@ pub fn set_lang(lang_code: &str)
     
 }
 
+pub fn get_lang() -> String
+{
+    let mut ret = String::new();
+    let s = CURR_LOCALE.lock().unwrap();
+    ret.push_str(s.as_str());
+    ret
+}
+
 pub fn get_translate(string_to_translate: String) -> String
 {
-    let mut m = TRANSLATE_MAP.lock().unwrap();
+    let m = TRANSLATE_MAP.lock().unwrap();
     let mut m_p = PREV_TRANSLATED.lock().unwrap();
-    let mut s = CURR_LOCALE.lock().unwrap();
-    //let translated_string = m.get(&string_to_translate).unwrap_or(&string_to_translate).to_string();
+    let s = CURR_LOCALE.lock().unwrap();
+    
     let translation_map = m.get(s.as_str()).unwrap();
     let ret;
     let tr_string = translation_map.get(&string_to_translate);
-    //println!("Got to if block");
-    if tr_string.is_some()//unwrap_or(&string_to_translate).to_string()
+    
+    //i have no idea how i go this to work.  it can find translations of strings previously translated
+    if tr_string.is_some()
     {
         ret = tr_string.unwrap().to_string();
-        //println!("Translating {}", ret);
+        
         m_p.insert((&ret).clone(), string_to_translate);
     }
     else if m_p.get(&string_to_translate).is_some()
@@ -97,7 +104,7 @@ pub fn get_translate(string_to_translate: String) -> String
         m_p.insert((&ret).clone(), weird_translate);
     }
     else {
-        //println!("else");
+        
         ret = string_to_translate;
     }
     ret
@@ -105,12 +112,21 @@ pub fn get_translate(string_to_translate: String) -> String
 
 pub fn load_translation()
 {
+    //load locale from system
+    let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
+    let lc_l = lc.to_ascii_lowercase();
+    let lc_trunc = lc_l.get(0..2);
+
+    println!("Locale is: {}", lc);
+
+    set_lang(lc_trunc.unwrap());
+
     let mut m = TRANSLATE_MAP.lock().unwrap();
     use std::io::{prelude::*, BufReader};
-    let mut file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+    let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
     
     let entries = std::fs::read_dir(file_path);
-    let mut file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+    let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
 
     let lang_files = entries.unwrap().filter_map(|entry| {
         entry.ok().and_then(|e| e.path().file_name().and_then(|n| n.to_str().map(|s| String::from(s))))
@@ -127,7 +143,7 @@ pub fn load_translation()
         //println!("{}", file_to_load);
         let file = std::fs::File::open( file_to_load );
 
-        //let buff = BufReader::new(file);
+        
         let buff = BufReader::new(file.unwrap());
 
         let mut line_iter = buff.lines();
@@ -138,7 +154,7 @@ pub fn load_translation()
 
         let mut lhm : HashMap<String, String> = HashMap::new();
 
-        //for 
+        
         while let Some(line) = line_iter.next()
         {
             line_t = line.unwrap().clone();

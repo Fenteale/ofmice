@@ -8,7 +8,6 @@ use installation::Installation;
 use progress::Progress;
 use platform::ssdk_exe;
 use download::download;
-use translate::*;
 
 use std::sync::Arc;
 use arc_swap::ArcSwap;
@@ -26,8 +25,9 @@ use gtk::*;
 use gdk_pixbuf::Pixbuf;
 
 //fentele stuff (locales)
-use gettextrs::*;
-use std::collections::HashMap;
+use translate::*;
+
+//use std::collections::HashMap;
 
 
 #[derive(Clone)]
@@ -168,17 +168,9 @@ impl Model {
     }
 
     fn build_ui(application: &gtk::Application) {
+
         //get localization ready
-        let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
-        let lc_l = lc.to_ascii_lowercase();
-        let lc_trunc = lc_l.get(0..2);
-        
-        println!("Locale is: {}", lc);
-        
-        
         load_translation();
-        set_lang(lc_trunc.unwrap());
-        
 
         // Build our UI from ze XML
         let builder = Builder::new_from_string(load_glade().as_ref());
@@ -293,11 +285,10 @@ impl Model {
             });
         }
 
-        //Set the default language
+        //Set the default language in language picker box
         let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
         
-        lang_select.set_active_id(lc_trunc);
-        //translate_ui(&builder);
+        lang_select.set_active_id(Some(&get_lang()));
 
         
         

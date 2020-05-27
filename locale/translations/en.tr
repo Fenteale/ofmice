@@ -1,22 +1,22 @@
 #: ../src/res/main.glade:4
 msgid "Open Fortress Launcher"
-msgstr "Open Fortress Launcher test"
+msgstr "Open Fortress Launcher"
 
 #: ../src/res/main.glade:77
 msgid "Source SDK Path"
-msgstr "Source SDK Path test"
+msgstr "Source SDK Path"
 
 #: ../src/res/main.glade:97
 msgid "Team Fortress 2 Path"
-msgstr "Team Fortress 2 Path test"
+msgstr "Team Fortress 2 Path"
 
 #: ../src/res/main.glade:116
 msgid "Launch options"
-msgstr "Launch options test"
+msgstr "Launch options"
 
 #: ../src/res/main.glade:134
 msgid "Language"
-msgstr "Language test"
+msgstr "Language"
 
 #: ../src/res/main.glade:191
 msgid "Please wait.."

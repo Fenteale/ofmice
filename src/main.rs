@@ -175,19 +175,16 @@ impl Model {
         
         println!("Locale is: {}", lc);
         
-        let mut tsm: HashMap<String, String>= HashMap::new();
-        load_translation(lc_trunc.unwrap_or("en"), &mut tsm);
+        
+        load_translation();
+        set_lang(lc_trunc.unwrap());
         
 
         // Build our UI from ze XML
         let builder = Builder::new_from_string(load_glade().as_ref());
 
         //translate UI
-        translate_ui(&builder, &mut tsm);
-
-
-        // Build our UI from ze XML
-        let builder = Builder::new_from_string(load_glade().as_ref());
+        translate_ui(&builder);
 
         // Apply the CSS to ze XML
         let provider = CssProvider::new();
@@ -300,7 +297,10 @@ impl Model {
         let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
         
         lang_select.set_active_id(lc_trunc);
-        translate_ui(&builder, &mut tsm);
+        //translate_ui(&builder);
+
+        
+        
 
         // Save the config when the config tab is navigated away from
         let home_screen: Notebook = builder.get_object("home_screen").unwrap();
@@ -331,6 +331,11 @@ impl Model {
 
         Self::connect_progress(&builder, model.clone());
 
+        lang_select.connect_changed(move |lang_select| {
+            set_lang(&lang_select.get_active_id().unwrap());
+            translate_ui(&builder);
+        });
+
         window.show_all();
     }
 
@@ -353,6 +358,8 @@ impl Model {
             });
         }
     }
+
+    
 }
 
 

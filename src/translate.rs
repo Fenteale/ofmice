@@ -30,27 +30,52 @@ pub fn load_translation(lang_code: &str, translate_map: &mut HashMap<String, Str
     let mut file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/").to_string();
     file_path.push_str(lang_code);
     file_path.push_str(".tr");
-    println!("language to load: {}", file_path);
-    let file = std::fs::File::open( file_path );
-    let buff = BufReader::new(file.unwrap());
+    //println!("language to load: {}", file_path);
+    //let buff;
+    let mut file;
+    if std::fs::metadata( file_path.clone() ).is_ok()
+    {
+        file = std::fs::File::open( file_path ).unwrap();
+    }
+    else {
+        file = std::fs::File::open( concat!(env!("CARGO_MANIFEST_DIR"), "/locale/en.tr")).unwrap();
+    }
+
+    let buff = BufReader::new(file);
+    //let buff = BufReader::new(file.unwrap());
 
     let mut line_iter = buff.lines();
     
     translate_map.clear();
-    
+    let mut line_t;
+    let mut line_n_t;
+
     while let Some(line) = line_iter.next()
     {
-        if let Some(line_n) = line_iter.next()
+        line_t = line.unwrap().clone();
+        if line_t.trim().starts_with("msgid")
         {
-            translate_map.entry(line.unwrap()).or_insert(line_n.unwrap());
+            let v: Vec<&str> = line_t.trim().splitn(3, '\"').collect();
+            while let Some(line_n) = line_iter.next()
+            {
+                line_n_t = line_n.unwrap().clone();
+                if line_n_t.trim().starts_with("msgstr")
+                {
+                    let v_n: Vec<&str> = line_n_t.trim().splitn(3, '\"').collect();
+                    translate_map.entry(String::from(v[1])).or_insert(String::from(v_n[1]));
+                    break;
+                }
+            }
         }
         
     }
+    
     /*
     for (orig, sts) in translate_map.iter()
     {
         println!("{} {}", orig, sts);
-    }*/ 
+    }
+    */
     
     
     

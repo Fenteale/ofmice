@@ -170,9 +170,13 @@ impl Model {
     fn build_ui(application: &gtk::Application) {
         //get localization ready
         let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
+        let lc_l = lc.to_ascii_lowercase();
+        let lc_trunc = lc_l.get(0..2);
+        
+        println!("Locale is: {}", lc);
         
         let mut tsm: HashMap<String, String>= HashMap::new();
-        //load_translation("en", &mut tsm);
+        load_translation(lc_trunc.unwrap_or("en"), &mut tsm);
         
 
         // Build our UI from ze XML
@@ -294,13 +298,8 @@ impl Model {
 
         //Set the default language
         let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
-
         
-        println!("Locale is: {}", lc);
-        let lc_l = lc.to_ascii_lowercase();
-        let lc_trunc = lc_l.get(0..2);
         lang_select.set_active_id(lc_trunc);
-        load_translation(lc_trunc.unwrap_or("en"), &mut tsm);
         translate_ui(&builder, &mut tsm);
 
         // Save the config when the config tab is navigated away from

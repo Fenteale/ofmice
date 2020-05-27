@@ -1,14 +1,23 @@
-Open Fortress Launcher
-RUSSIAN
-Play
-RUSSIAN2
-Source SDK Path
-RUSSIAN3
-Team Fortress 2 Path
-RUSSIAN4
-Launch options
-RUSSIAN5
-Language
-RUSSIAN6
-Please wait..
-RUSSIAN7
+#: ../src/res/main.glade:4
+msgid "Open Fortress Launcher"
+msgstr "RUSSIAN1"
+
+#: ../src/res/main.glade:77
+msgid "Source SDK Path"
+msgstr "RUSSIAN2"
+
+#: ../src/res/main.glade:97
+msgid "Team Fortress 2 Path"
+msgstr "RUSSIAN3"
+
+#: ../src/res/main.glade:116
+msgid "Launch options"
+msgstr "RUSSIAN4"
+
+#: ../src/res/main.glade:134
+msgid "Language"
+msgstr "RUSSIAN5"
+
+#: ../src/res/main.glade:191
+msgid "Please wait.."
+msgstr "RUSSIAN6"

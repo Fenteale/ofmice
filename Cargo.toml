@@ -1,7 +1,7 @@
 [package]
 name = "ofmice"
 version = "0.1.0"
-authors = ["Magnus 'Nopey' Larsen <imjustagan@gmail.com>", "Tzlil 'Terradice' <terradice@protonmail.com>"]
+authors = ["Magnus 'Nopey' Larsen <imjustagan@gmail.com>", "Tzlil 'Terradice' <terradice@protonmail.com>", "'Fenteale' <mangmasta@gmail.com>"]
 edition = "2018"
 default-run = "ofmice"
 

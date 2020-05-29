@@ -12,7 +12,7 @@ use download::download;
 use std::sync::Arc;
 use arc_swap::ArcSwap;
 use std::rc::Rc;
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::ops::Deref;
 use std::path::Path;
 
@@ -26,6 +26,7 @@ use gdk_pixbuf::Pixbuf;
 
 //fentele stuff (locales)
 use translate::*;
+use std::borrow::Borrow;
 
 //use std::collections::HashMap;
 
@@ -63,6 +64,7 @@ lazy_static!{
 }
 
 struct Model {
+    translate: RefCell<Translate>,
     // any other fields you add here won't be saved between runs of the launcher
     // hold some news-related info here?
     // a stream for communicating with the worker thread
@@ -169,14 +171,12 @@ impl Model {
 
     fn build_ui(application: &gtk::Application) {
 
-        //get localization ready
-        load_translation();
+        
 
         // Build our UI from ze XML
         let builder = Builder::new_from_string(load_glade().as_ref());
 
-        //translate UI
-        translate_ui(&builder);
+       
 
         // Apply the CSS to ze XML
         let provider = CssProvider::new();
@@ -200,12 +200,19 @@ impl Model {
         let play_button_image: Image = builder.get_object("play_button_image").unwrap();
 
         // For the UI model
-        let model = Rc::new(Model{
+        let mut model = Rc::new(Model{
+            translate: RefCell::new(Translate::load_translation()),
             button_pixbufs,
             ed: ErrorDisplayer{window: window.clone()},
             main_button_state: Cell::new(if INST.load().are_paths_good(){4}else{3}), // WAIT else CONFIG
             play_button_image: play_button_image.clone()
         });
+
+        //get localization ready
+        //model.translate.load_translation();
+
+        //translate UI
+        model.translate.borrow_mut().translate_ui(&builder);
 
         // steam_wrangler if needed
         let mut inst = INST.load().deref().deref().clone();
@@ -288,7 +295,7 @@ impl Model {
         //Set the default language in language picker box
         let lang_select: ComboBox = builder.get_object("langs_sel").unwrap();
         
-        lang_select.set_active_id(Some(&get_lang()));
+        lang_select.set_active_id(Some(&model.translate.borrow().get_lang()));
 
         
         
@@ -323,8 +330,8 @@ impl Model {
         Self::connect_progress(&builder, model.clone());
 
         lang_select.connect_changed(move |lang_select| {
-            set_lang(&lang_select.get_active_id().unwrap());
-            translate_ui(&builder);
+            model.translate.borrow_mut().set_lang(&lang_select.get_active_id().unwrap());
+            model.translate.borrow_mut().translate_ui(&builder);
         });
 
         window.show_all();

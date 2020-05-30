@@ -94,6 +94,7 @@ impl Translate{
         ret
     }
 
+    #[cfg(debug_assertions)]
     pub fn load_translation() -> Translate
     {
         //create local variables
@@ -123,10 +124,10 @@ impl Translate{
 
         //let mut m = TRANSLATE_MAP.lock().unwrap();
         use std::io::{prelude::*, BufReader};
-        let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+        let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/src/res/locale/translations/").to_string();
         
         let entries = std::fs::read_dir(file_path);
-        let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+        let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/src/res/locale/translations/").to_string();
 
         let lang_files = entries.unwrap().filter_map(|entry| {
             entry.ok().and_then(|e| e.path().file_name().and_then(|n| n.to_str().map(|s| String::from(s))))
@@ -164,6 +165,121 @@ impl Translate{
                     while let Some(line_n) = line_iter.next()
                     {
                         line_n_t = line_n.unwrap().clone();
+                        if line_n_t.trim().starts_with("msgstr")
+                        {
+                            let v_n: Vec<&str> = line_n_t.trim().splitn(3, '\"').collect();
+                            lhm.entry(String::from(v[1])).or_insert(String::from(v_n[1]));
+                            
+                            break;
+                        }
+                    }
+                }
+                
+            }
+            m.entry(String::from(v_loc[0])).or_insert(lhm);
+        }
+        if m.contains_key(lc_trunc.unwrap())
+        {
+            s = lc_trunc.unwrap().to_string();
+        }
+        else {
+            s = "en".to_string();
+        }
+
+
+        Translate{translated_map: m , prev_translated: m_p, curr_locale: s}
+        /*
+        for (orig, sts) in m.iter()
+        {
+            println!("{} {:?}", orig, sts);
+        }*/ 
+        
+        
+        
+    }
+
+    #[cfg(not(debug_assertions))]
+    pub fn load_translation() -> Translate  //TODO: this is a hellish implementation.  Need to make this not as hardcoded
+    {
+        //create local variables
+        let mut m : HashMap<String, HashMap<String, String>> = HashMap::new();
+        let m_p : HashMap<String, String> = HashMap::new(); 
+        let mut s = String::new();
+
+        //load locale from system
+        let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
+        let lc_trunc;
+        let lc_l = lc.to_ascii_lowercase().clone();
+        if lc == "Polish_Poland.1250"
+        {
+            //windows reports polish locale as being "Polish_Poland.1250", which when truncated becomes
+            //"po".  The standard UTF-8 string for polish is "pl.UTF-8", so we convert it to the utf 8 version
+            lc_trunc = Some("pl");
+            //maybe in the future if this becomes a gigantic pain to keep track of, I need to make like a windows to utf-8
+            //locale converter
+        }
+        else {
+            
+            lc_trunc = lc_l.get(0..2);
+        }
+        println!("Locale is: {}", lc);
+
+        
+        use std::io::{prelude::*, BufReader};
+        //let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+        
+        //let entries = std::fs::read_dir(file_path);
+        //let file_path = concat!(env!("CARGO_MANIFEST_DIR"), "/locale/translations/").to_string();
+
+        //let lang_files = entries.unwrap().filter_map(|entry| {
+        //    entry.ok().and_then(|e| e.path().file_name().and_then(|n| n.to_str().map(|s| String::from(s))))
+        //}).collect::<Vec<String>>();
+        //const lang_files: [ &str; 3 ] = ["en.tr", "ru.tr", "pl.tr"];
+        let mut lang_files : Vec<String> = Vec::new();
+        lang_files.push(String::from(include_str!("res/locale/translations/en.tr")));
+        lang_files.push(String::from(include_str!("res/locale/translations/ru.tr")));
+        lang_files.push(String::from(include_str!("res/locale/translations/pl.tr")));
+
+        let mut flc : Vec<&str> = Vec::new();
+        flc.push("en.tr");
+        flc.push("ru.tr");
+        flc.push("pl.tr");
+        let mut flc_i = flc.iter();
+
+        m.clear();
+        for buff in lang_files
+        {
+            let v_loc: Vec<&str> = flc_i.next().unwrap().split(".").collect();
+            /*
+            let mut file_to_load = String::new();
+            file_to_load.push_str(file_path.as_str());
+            file_to_load.push_str(v_loc[0]);
+            file_to_load.push_str(".tr");
+            //println!("{}", file_to_load);
+            let file = std::fs::File::open( file_to_load );
+            */
+            //let file = include_str!(loc);
+            
+            //let buff = BufReader::new(file.unwrap());
+
+            let mut line_iter = buff.lines();
+            
+            
+            let mut line_t;
+            let mut line_n_t;
+
+            let mut lhm : HashMap<String, String> = HashMap::new();
+
+            
+            while let Some(line) = line_iter.next()
+            {
+                line_t = line.clone();
+                if line_t.trim().starts_with("msgid")
+                {
+                    let v: Vec<&str> = line_t.trim().splitn(3, '\"').collect();
+                    while let Some(line_n) = line_iter.next()
+                    {
+                        line_n_t = line_n.clone();
                         if line_n_t.trim().starts_with("msgstr")
                         {
                             let v_n: Vec<&str> = line_n_t.trim().splitn(3, '\"').collect();

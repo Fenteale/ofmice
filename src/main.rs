@@ -218,8 +218,9 @@ impl Model {
 
         // initialize state
         play_button_image.set_from_pixbuf(Some(&model.button_pixbufs[model.main_button_state.get() + model.translate.borrow().get_img_offset()]));
+        model.set_main_button_state(model.main_button_state.get() + model.translate.borrow().get_img_offset());
 
-        if model.main_button_state.get()==4 { //WAIT
+        if model.main_button_state.get()==4+model.translate.borrow().get_img_offset() { //WAIT
             let (tx, rx) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
 
             //TODO: occasionally check for updates if idle?

@@ -1,34 +1,10 @@
-use gtk::*;
+use gtk::BuilderExt;
 use glib::object::ObjectExt;
 use std::collections::HashMap;
 
-use lazy_static::lazy_static;
-use std::sync::Mutex;
 use gettextrs::{setlocale, LocaleCategory};
 
 pub struct Translate{
-    /*
-    lazy_static! {
-        static ref TRANSLATE_MAP: Mutex<HashMap<String, HashMap<String, String>>> = {
-            let m = HashMap::new();
-            Mutex::new(m)
-        };
-    }
-
-    lazy_static! {
-        static ref PREV_TRANSLATED: Mutex<HashMap<String, String>> = {
-            let m = HashMap::new();
-            Mutex::new(m)
-        };
-    }
-
-    lazy_static! {
-        static ref CURR_LOCALE: Mutex<String> = {
-            let s = String::new();
-            Mutex::new(s)
-        };
-    }
-    */
     translated_map: HashMap<String, HashMap<String, String>>, //= HashMap::new();
     prev_translated : HashMap<String, String>,
     curr_locale : String,
@@ -74,14 +50,17 @@ impl Translate{
 
     pub fn get_lang(&self) -> String
     {
-        /*
-        let mut ret = String::new();
-        let s = CURR_LOCALE.lock().unwrap();
-        ret.push_str(s.as_str());
-        ret
-        */
-        let ret = String::from(self.curr_locale.clone());
-        ret
+        self.curr_locale.clone().to_string()
+    }
+    pub fn get_img_offset(&self) -> usize
+    {
+        match self.get_lang().as_str()
+        {
+            "en" => 0,
+            "ru" => 5,
+            "pl" => 10,
+            _ => 0
+        }
     }
 
     pub fn get_translate(&mut self, string_to_translate: String) -> String
@@ -124,9 +103,20 @@ impl Translate{
 
         //load locale from system
         let lc = setlocale(LocaleCategory::LcMessages, "".to_owned()).unwrap_or("en_US.UTF-8".to_string());
-        let lc_l = lc.to_ascii_lowercase();
-        let lc_trunc = lc_l.get(0..2);
-
+        let lc_trunc;
+        let lc_l = lc.to_ascii_lowercase().clone();
+        if lc == "Polish_Poland.1250"
+        {
+            //windows reports polish locale as being "Polish_Poland.1250", which when truncated becomes
+            //"po".  The standard UTF-8 string for polish is "pl.UTF-8", so we convert it to the utf 8 version
+            lc_trunc = Some("pl");
+            //maybe in the future if this becomes a gigantic pain to keep track of, I need to make like a windows to utf-8
+            //locale converter
+        }
+        else {
+            
+            lc_trunc = lc_l.get(0..2);
+        }
         println!("Locale is: {}", lc);
 
         //self.set_lang(lc_trunc.unwrap());

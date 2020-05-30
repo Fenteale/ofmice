@@ -33,7 +33,7 @@ pub fn load_close_icon() -> Pixbuf {
     Pixbuf::new_from_stream(&data_stream, None as Option<&Cancellable>).unwrap()
 }
 
-const BUTTON_COUNT: i32 = 5;
+const BUTTON_COUNT: i32 = 15;
 pub fn load_button_pixbufs() -> [Pixbuf; BUTTON_COUNT as usize] {
     static DATA: &[u8] = include_bytes!("buttons.png");
     let data_stream = MemoryInputStream::new_from_bytes(&Bytes::from_static(DATA));
@@ -53,6 +53,18 @@ pub fn load_button_pixbufs() -> [Pixbuf; BUTTON_COUNT as usize] {
     // really ugly but i don't want to pull in a dep to make it better
     // and dont know how else to do it.
     [
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        //russian
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        iter.next().unwrap(),
+        //polish
         iter.next().unwrap(),
         iter.next().unwrap(),
         iter.next().unwrap(),

@@ -144,6 +144,7 @@
                         <items>
                           <item translatable="no" id="en">English</item>
                           <item translatable="no" id="ru">Русский</item>
+                          <item translatable="no" id="pl">Polski</item>
                         </items>
                       </object>
                       <packing>

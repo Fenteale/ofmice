@@ -26,9 +26,6 @@ use gdk_pixbuf::Pixbuf;
 
 //fentele stuff (locales)
 use translate::*;
-use std::borrow::Borrow;
-
-//use std::collections::HashMap;
 
 
 #[derive(Clone)]
@@ -68,7 +65,7 @@ struct Model {
     // any other fields you add here won't be saved between runs of the launcher
     // hold some news-related info here?
     // a stream for communicating with the worker thread
-    button_pixbufs: [Pixbuf; 5],
+    button_pixbufs: [Pixbuf; 15],
     // Errorbox
     //TODO: Maybe migrate everything off of the errordisplayer type onto Model?
     ed: ErrorDisplayer,
@@ -200,7 +197,7 @@ impl Model {
         let play_button_image: Image = builder.get_object("play_button_image").unwrap();
 
         // For the UI model
-        let mut model = Rc::new(Model{
+        let model = Rc::new(Model{
             translate: RefCell::new(Translate::load_translation()),
             button_pixbufs,
             ed: ErrorDisplayer{window: window.clone()},
@@ -220,7 +217,7 @@ impl Model {
         INST.store(Arc::new(inst));
 
         // initialize state
-        play_button_image.set_from_pixbuf(Some(&model.button_pixbufs[model.main_button_state.get()]));
+        play_button_image.set_from_pixbuf(Some(&model.button_pixbufs[model.main_button_state.get() + model.translate.borrow().get_img_offset()]));
 
         if model.main_button_state.get()==4 { //WAIT
             let (tx, rx) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
@@ -235,7 +232,7 @@ impl Model {
             }})());
 
             let model = model.clone();
-            rx.attach(None, move |value| {model.set_main_button_state(value); Continue(false)});
+            rx.attach(None, move |value| {model.set_main_button_state(value + model.translate.borrow().get_img_offset()); Continue(false)});
         }
 
         // transparent hooks
@@ -330,8 +327,10 @@ impl Model {
         Self::connect_progress(&builder, model.clone());
 
         lang_select.connect_changed(move |lang_select| {
+            let prev_mbs = model.main_button_state.get() - model.translate.borrow().get_img_offset();
             model.translate.borrow_mut().set_lang(&lang_select.get_active_id().unwrap());
             model.translate.borrow_mut().translate_ui(&builder);
+            model.set_main_button_state(prev_mbs + model.translate.borrow().get_img_offset());
         });
 
         window.show_all();

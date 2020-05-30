@@ -1,0 +1,23 @@
+#: ../src/res/main.glade:4
+msgid "Open Fortress Launcher"
+msgstr "POLISH1"
+
+#: ../src/res/main.glade:77
+msgid "Source SDK Path"
+msgstr "POLISH2"
+
+#: ../src/res/main.glade:97
+msgid "Team Fortress 2 Path"
+msgstr "POLISH3"
+
+#: ../src/res/main.glade:116
+msgid "Launch options"
+msgstr "POLISH4"
+
+#: ../src/res/main.glade:134
+msgid "Language"
+msgstr "POLISH5"
+
+#: ../src/res/main.glade:191
+msgid "Please wait.."
+msgstr "POLISH6"
